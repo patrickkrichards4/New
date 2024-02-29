@@ -1,46 +1,93 @@
-// app.js
-document.addEventListener('DOMContentLoaded', function () {
-    const paintingsContainer = document.getElementById('paintings');
+# Install necessary packages
+npm init -y
+npm install express ejs
+// app.js (Express.js server)
+const express = require('express');
+const path = require('path');
+const app = express();
 
-    // Sample data for paintings
-    const paintings = [
-        {
-            title: 'Starry Night',
-            artist: 'Vincent van Gogh',
-            description: 'Starry Night is one of Van Gogh\'s most famous paintings.',
-            imageUrl: 'starry-night.jpg',
-        },
-        // Add more paintings as needed
-    ];
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
-    // Display paintings on the page
-    paintings.forEach(painting => {
-        const paintingElement = createPaintingElement(painting);
-        paintingsContainer.appendChild(paintingElement);
-    });
+app.use(express.static(path.join(__dirname, 'public')));
 
-    function createPaintingElement(painting) {
-        const paintingElement = document.createElement('div');
-        paintingElement.classList.add('painting');
+// Sample data for paintings
+const paintings = [
+    {
+        title: 'Starry Night',
+        artist: 'Vincent van Gogh',
+        description: 'Starry Night is one of Van Gogh\'s most famous paintings.',
+        imageUrl: 'starry-night.jpg',
+    },
+    // Add more paintings as needed
+];
 
-        const imageElement = document.createElement('img');
-        imageElement.src = painting.imageUrl;
-        imageElement.alt = painting.title;
-
-        const titleElement = document.createElement('h2');
-        titleElement.textContent = painting.title;
-
-        const artistElement = document.createElement('p');
-        artistElement.textContent = `Artist: ${painting.artist}`;
-
-        const descriptionElement = document.createElement('p');
-        descriptionElement.textContent = painting.description;
-
-        paintingElement.appendChild(imageElement);
-        paintingElement.appendChild(titleElement);
-        paintingElement.appendChild(artistElement);
-        paintingElement.appendChild(descriptionElement);
-
-        return paintingElement;
-    }
+app.get('/', (req, res) => {
+    res.render('index', { paintings });
 });
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+<!-- views/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <title>Art Gallery</title>
+</head>
+<body>
+    <header>
+        <h1>Art Gallery</h1>
+    </header>
+
+    <section id="paintings">
+        <% paintings.forEach(painting => { %>
+            <div class="painting">
+                <img src="<%= painting.imageUrl %>" alt="<%= painting.title %>">
+                <h2><%= painting.title %></h2>
+                <p>Artist: <%= painting.artist %></p>
+                <p><%= painting.description %></p>
+            </div>
+        <% }); %>
+    </section>
+</body>
+</html>
+/* public/styles.css */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1em;
+}
+
+#paintings {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 1em;
+}
+
+.painting {
+    border: 1px solid #ddd;
+    margin: 1em;
+    padding: 1em;
+    width: 300px;
+}
+
+.painting img {
+    max-width: 100%;
+    height: auto;
+}
+
+.painting p {
+    margin-top: 1em;
+}
+node app.js
